@@ -3,23 +3,29 @@
 This is a class that can handle many different gameobject pools simultaneously.
 
 ## Table Of Contents
-    - [Creating An Object Pooler](https://github.com/SlamDewey/Unity-Object-Pooler#creating-the-object-pooler)
+ - [Creating An Object Pooler](https://github.com/SlamDewey/Unity-Object-Pooler#creating-the-object-pooler)
+    - [The `UseParentTransforms` Variable]()
+    - [Poolable Types](https://github.com/SlamDewey/Unity-Object-Pooler#poolable-types)
+ - [Using The Object Pooler In Your Code](https://github.com/SlamDewey/Unity-Object-Pooler#using-the-object-pooler-in-your-code)
+    - [Getting Objects from a Pool](https://github.com/SlamDewey/Unity-Object-Pooler#getting-objects-from-a-pool)
+    - [Destroying Objects](https://github.com/SlamDewey/Unity-Object-Pooler#destroying-objects)
+    - [Adding Special Functionality](https://github.com/SlamDewey/Unity-Object-Pooler#adding-special-functionality)
 
+======
 ## Creating The Object Pooler
-
 To create an instance of the Object Pooler, simply add the script as a component to a game object in the Unity scene.
 Upon inspecting the host game object, you should see the following:
 
 ![A blank object pooler](/images/1.png)
 
 ###### _Note: Do not create multiple instances of the Object Pooler, the Class uses Singleton_
-
-### Use Parent Transforms Checkbox
+======
+### The `UseParentTransforms` Variable
 The first variable you will see in the inspector is a boolean asking if the Object Pooler should use Parent Transforms.
 When checked, the object pooler will organize object pools underneath gameobjects using transform parents.  
 
 This is essentially just used for organization of the insepctor, and will not affect operation.
-
+======
 ### Poolable Types
 The second variable in the inspector is a `List<PoolableType>`. A `PoolableType` is a class defined at the top of the `ObjectPooler.cs`
 file, and is used to house variables used to define a Pool and it's Objects.
@@ -50,19 +56,23 @@ I wil briefly summarize the purpose of each variable below:
 ![An Example of an object pooler](/images/3.png)
 
 
+======
 ## Using The Object Pooler In Your Code
 ###### _Note: The Object Pooler class uses static functions and a private static singleton_
 
+======
 ### Getting Objects from a Pool
 
 When you need to "create" a new object (i.e. you would like to request an object from the pool) you will call the `Instantiate` function.
 An object instantiation can have two distinct options:
 
+======
 #### Option 1: Using the Prefab
 When Instantiating, you may pass a reference to a Prefab that the Object Pooler is managing,
 ```c#
 ObjectPooler.Instantiate(ProjectilePrefab, SpawnTransform.position, SpawnTransform.rotation);
 ```
+======
 #### Option 2: Using A Tag
 Alternatively, you can pass in the tag that the Object Pooler is assigning to the GameObject's you want.
 ```c#
@@ -73,6 +83,7 @@ In both cases, if the Identifier (Prefab or Tag) is not found in the set of Pool
 Therefore you can check the return value of the `Instantiate()` function, to know if it was successful or not.
 
 
+======
 ### Destroying Objects
 Destroying objects is just as simple, you will simply ask the Object Pooler to "destroy" the object for you like so:
 ```c#
@@ -80,6 +91,7 @@ ObjectPooler.Destroy(this.gameObject);
 ```
 
 
+======
 ### Adding Special Functionality
 You may now wonder:
 > What if I want to do something to an object when it is "destroyed" or "instantiated"?
