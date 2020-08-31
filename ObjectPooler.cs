@@ -115,10 +115,10 @@ public class ObjectPooler : MonoBehaviour
     /// <param name="Position">The Position to activate the object at</param>
     /// <param name="Rotation">The Rotation to activate the object with</param>
     /// <returns>A gameobject from the correct pool</returns>
-    public static new GameObject Instantiate<T>(T Identifier, Vector3 Position, Quaternion Rotation) =>
-        Instance._Instantiate(Identifier, Position, Rotation);
+    public static GameObject GetObject<T>(T Identifier, Vector3 Position, Quaternion Rotation) =>
+        Instance._GetObject(Identifier, Position, Rotation);
 
-    private GameObject _Instantiate<T>(T Identifier, Vector3 Position, Quaternion Rotation)
+    private GameObject _GetObject<T>(T Identifier, Vector3 Position, Quaternion Rotation)
     {
         // get the tag of the prefab we wish to instantiate
         string Tag = "";

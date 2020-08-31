@@ -63,22 +63,22 @@ ___
 ___
 ### Getting Objects from a Pool
 
-When you need to "create" a new object (i.e. you would like to request an object from the pool) you will call the `Instantiate` function.
+When you need to "create" a new object (i.e. you would like to request an object from the pool) you will call the `GetObject` function.
 An object instantiation can have two distinct options:
 
 #### Option 1: Using the Prefab
 When Instantiating, you may pass a reference to a Prefab that the Object Pooler is managing,
 ```c#
-ObjectPooler.Instantiate(ProjectilePrefab, SpawnTransform.position, SpawnTransform.rotation);
+ObjectPooler.GetObject(ProjectilePrefab, SpawnTransform.position, SpawnTransform.rotation);
 ```
 #### Option 2: Using A Tag
 Alternatively, you can pass in the tag that the Object Pooler is assigning to the GameObject's you want.
 ```c#
-ObjectPooler.Instantiate("PlayerProjectile", SpawnTransform.position, SpawnTransform.rotation);
+ObjectPooler.GetObject("PlayerProjectile", SpawnTransform.position, SpawnTransform.rotation);
 ```
 
 In both cases, if the `Identifier` (Prefab or Tag) is not found in the set of PoolableTypes, then the Object Pooler will return `null`.
-Therefore you can check the return value of the `Instantiate()` function, to know if it was successful or not.
+Therefore you can check the return value of the `GetObject()` function, to know if it was successful or not.
 
 ___
 ### Destroying Objects
