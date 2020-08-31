@@ -3,7 +3,7 @@ A MonoBehaviour that can handle many different gameobject pools simultaneously.
 
 ___
 ## Table Of Contents
- - [Creating An Object Pooler](https://github.com/SlamDewey/Unity-Object-Pooler#creating-the-object-pooler)
+ - [Creating The Object Pooler](https://github.com/SlamDewey/Unity-Object-Pooler#creating-the-object-pooler)
     - [The `UseParentTransforms` Variable](https://github.com/SlamDewey/Unity-Object-Pooler#the-useparenttransforms-variable)
     - [Poolable Types](https://github.com/SlamDewey/Unity-Object-Pooler#poolable-types)
  - [Using The Object Pooler In Your Code](https://github.com/SlamDewey/Unity-Object-Pooler#using-the-object-pooler-in-your-code)
