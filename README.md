@@ -28,7 +28,7 @@ This is essentially just used for organization of the insepctor, and will not af
 ___
 ### Poolable Types
 The second variable in the inspector is a `List<PoolableType>`. A `PoolableType` is a class defined at the top of the `ObjectPooler.cs`
-file, and is used to house variables used to define a Pool and it's Objects.
+file, and is used to house variables for the Object Pooler.
 
 ![Creating the first PoolableType](/images/2.png)
 
