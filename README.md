@@ -27,16 +27,21 @@ file, and is used to house variables used to define a Pool and it's Objects.
 ![Creating the first PoolableType](/images/2.png)
 
 I wil briefly summarize the purpose of each variable below:
+
     - `Name`
         - The Name of the PoolableType does not affect operation, and is simply used to organize the List of Poolable Types.
+
     - `Prefab`
         - The Prefab slot stores a reference to the prefab that you want to pool.  The Object Pooler class will use this prefab definition when
           instantiating new objects.
+
     - `Sorting Tag`
         - Each object tracked by the object pooler is organized using GameObject Tags.
+
 ###### _Note: No two `PooledType`'s can use the same Tag_
     - `Max`
         - The value of Max is used to define the initial quantity of objects that the pool should instantiate.
+        
     - `Auto Expand`
         - When the user requests an object from an Object Pool, it may be the case that the Pooler has no objects left to give.  If Auto Expand is set to True, the 
           Object Pooler will instantiate and begin tracking a new instance of the associated Prefab, regardless of the value of `Max`.
