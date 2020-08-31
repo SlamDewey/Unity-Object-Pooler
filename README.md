@@ -1,7 +1,7 @@
 # Unity Object Pooler
+A MonoBehaviour that can handle many different gameobject pools simultaneously.
 
-This is a class that can handle many different gameobject pools simultaneously.
-
+___
 ## Table Of Contents
  - [Creating An Object Pooler](https://github.com/SlamDewey/Unity-Object-Pooler#creating-the-object-pooler)
     - [The `UseParentTransforms` Variable](https://github.com/SlamDewey/Unity-Object-Pooler#the-useparenttransforms-variable)
@@ -43,7 +43,7 @@ I wil briefly summarize the purpose of each variable below:
 
  - `Sorting Tag`
     - Each object tracked by the object pooler is organized using GameObject Tags.
-###### _Note: No two `PooledType`'s can use the same Tag_
+###### _Note: No two `PooledType`'s can use the same `Sorting Tag`_
  - `Max`
     - The value of Max is used to define the initial quantity of objects that the pool should instantiate.
 
@@ -66,22 +66,19 @@ ___
 When you need to "create" a new object (i.e. you would like to request an object from the pool) you will call the `Instantiate` function.
 An object instantiation can have two distinct options:
 
-___
 #### Option 1: Using the Prefab
 When Instantiating, you may pass a reference to a Prefab that the Object Pooler is managing,
 ```c#
 ObjectPooler.Instantiate(ProjectilePrefab, SpawnTransform.position, SpawnTransform.rotation);
 ```
-___
 #### Option 2: Using A Tag
 Alternatively, you can pass in the tag that the Object Pooler is assigning to the GameObject's you want.
 ```c#
 ObjectPooler.Instantiate("PlayerProjectile", SpawnTransform.position, SpawnTransform.rotation);
 ```
 
-In both cases, if the Identifier (Prefab or Tag) is not found in the set of PoolableTypes, then the Object Pooler will return `null`.
+In both cases, if the `Identifier` (Prefab or Tag) is not found in the set of PoolableTypes, then the Object Pooler will return `null`.
 Therefore you can check the return value of the `Instantiate()` function, to know if it was successful or not.
-
 
 ___
 ### Destroying Objects
