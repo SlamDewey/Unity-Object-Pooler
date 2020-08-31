@@ -32,7 +32,7 @@ file, and is used to house variables for the Object Pooler.
 
 ![Creating the first PoolableType](/images/2.png)
 
-I wil briefly summarize the purpose of each variable below:
+I will briefly summarize the purpose of each variable below:
 
  - `Name`
     - The Name of the PoolableType does not affect operation, and is simply used to organize the List of Poolable Types.
