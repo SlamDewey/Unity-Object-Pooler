@@ -29,11 +29,9 @@ public class ObjectPooler : MonoBehaviour
     /// <summary>
     /// A static instance of the ObjectPooler
     /// </summary>
-	public static ObjectPooler Instance;
+	private static ObjectPooler Instance;
 
-    [Tooltip(
-@"If true, the Object Pooler will organize individual object pools under assigned parent transforms.
-Only works if checked before starting the game.")]
+    [Tooltip("If true, the Object Pooler will organize individual object pools under assigned parent transforms. Only works if checked before starting the game.")]
     [SerializeField]
     private bool UseParentTransforms = false;
 
@@ -88,11 +86,12 @@ Only works if checked before starting the game.")]
     #endregion
 
     #region Destroy
+    public static void Destroy(GameObject obj) => Instance._Destroy(obj);
     /// <summary>
     /// Deactivate an active object, and enqueue it for later restoration.
     /// </summary>
     /// <param name="obj">The active object to deactivate</param>
-    public void Destroy(GameObject obj)
+    private void _Destroy(GameObject obj)
     {
         // check if this object is one we actually pool
         if (!ActiveObjects.ContainsKey(obj.tag)) return;
@@ -115,8 +114,11 @@ Only works if checked before starting the game.")]
     /// <param name="Identifier">Either the Prefab to instantiate or the Tag for the PoolableType</param>
     /// <param name="Position">The Position to activate the object at</param>
     /// <param name="Rotation">The Rotation to activate the object with</param>
-    /// <returns></returns>
-    public new GameObject Instantiate<T>(T Identifier, Vector3 Position, Quaternion Rotation)
+    /// <returns>A gameobject from the correct pool</returns>
+    public static new GameObject Instantiate<T>(T Identifier, Vector3 Position, Quaternion Rotation) =>
+        Instance._Instantiate(Identifier, Position, Rotation);
+
+    private GameObject _Instantiate<T>(T Identifier, Vector3 Position, Quaternion Rotation)
     {
         // get the tag of the prefab we wish to instantiate
         string Tag = "";
@@ -134,7 +136,7 @@ Only works if checked before starting the game.")]
         }
         else return null;
 
-        // If we make it here, we know the tag has been set.
+        // If we make it here, we know the tag has been set and exists.
         GameObject Member = null;
         // if no objects are left in the queue, but we can auto expand, then make a new object
         if (SleepingObjects[Tag].Count == 0 && TagTypeLookup[Tag].AutoExpand)
