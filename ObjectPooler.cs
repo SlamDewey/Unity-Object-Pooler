@@ -1,5 +1,4 @@
-﻿
-/*
+﻿/*
  *	Unit Object Pooler Implemenation Created By Jared Massa
  *
  *	Copyright (c) 2020 Jared Massa
@@ -130,7 +129,7 @@ public class ObjectPooler : MonoBehaviour
     }
     #endregion
 
-    #region Instantiate
+    #region Generate
     /// <summary>
     /// Grab a member from the list of SleepingObjects
     /// </summary>
@@ -139,10 +138,29 @@ public class ObjectPooler : MonoBehaviour
     /// <param name="Position">The Position to activate the object at</param>
     /// <param name="Rotation">The Rotation to activate the object with</param>
     /// <returns>A gameobject from the correct pool</returns>
-    public static GameObject GetObject<T>(T Identifier, Vector3 Position, Quaternion Rotation) =>
-        Instance._GetObject(Identifier, Position, Rotation);
+    public static GameObject Generate<T>(T Identifier, Vector3 Position, Quaternion Rotation) =>
+        Instance._Generate(Identifier, Position, Rotation);
 
-    private GameObject _GetObject<T>(T Identifier, Vector3 Position, Quaternion Rotation)
+    /// <summary>
+    /// Grab a member from the list of SleepingObjects
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="Identifier">Either the Prefab to instantiate or the Tag for the PoolableType</param>
+    /// <param name="Position">The Position to activate the object at</param>
+    /// <returns>A gameobject from the correct pool</returns>
+    public static GameObject Generate<T>(T Identifier, Vector3 Position) =>
+        Instance._Generate(Identifier, Position, Quaternion.identity);
+
+    /// <summary>
+    /// Grab a member from the list of SleepingObjects
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="Identifier">Either the Prefab to instantiate or the Tag for the PoolableType</param>
+    /// <returns>A gameobject from the correct pool</returns>
+    public static GameObject Generate<T>(T Identifier) =>
+        Instance._Generate(Identifier, Vector3.zero, Quaternion.identity);
+
+    private GameObject _Generate<T>(T Identifier, Vector3 Position, Quaternion Rotation)
     {
         // get the tag of the prefab we wish to instantiate
         string Tag = "";
