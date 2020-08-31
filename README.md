@@ -28,23 +28,22 @@ file, and is used to house variables used to define a Pool and it's Objects.
 
 I wil briefly summarize the purpose of each variable below:
 
-    - `Name`
-        - The Name of the PoolableType does not affect operation, and is simply used to organize the List of Poolable Types.
+ - `Name`
+    - The Name of the PoolableType does not affect operation, and is simply used to organize the List of Poolable Types.
 
-    - `Prefab`
-        - The Prefab slot stores a reference to the prefab that you want to pool.  The Object Pooler class will use this prefab definition when
-          instantiating new objects.
+ - `Prefab`
+    - The Prefab slot stores a reference to the prefab that you want to pool.  The Object Pooler class will use this prefab definition when
+      instantiating new objects.
 
-    - `Sorting Tag`
-        - Each object tracked by the object pooler is organized using GameObject Tags.
-
+ - `Sorting Tag`
+    - Each object tracked by the object pooler is organized using GameObject Tags.
 ###### _Note: No two `PooledType`'s can use the same Tag_
-    - `Max`
-        - The value of Max is used to define the initial quantity of objects that the pool should instantiate.
-        
-    - `Auto Expand`
-        - When the user requests an object from an Object Pool, it may be the case that the Pooler has no objects left to give.  If Auto Expand is set to True, the 
-          Object Pooler will instantiate and begin tracking a new instance of the associated Prefab, regardless of the value of `Max`.
+ - `Max`
+    - The value of Max is used to define the initial quantity of objects that the pool should instantiate.
+
+ - `Auto Expand`
+    - When the user requests an object from an Object Pool, it may be the case that the Pooler has no objects left to give.  If Auto Expand is set to True, the 
+      Object Pooler will instantiate and begin tracking a new instance of the associated Prefab, regardless of the value of `Max`.
 
 #### An example of a properly created `ObjectPooler` may look like:
 
@@ -59,16 +58,17 @@ I wil briefly summarize the purpose of each variable below:
 When you need to "create" a new object (i.e. you would like to request an object from the pool) you will call the `Instantiate` function.
 An object instantiation can have two distinct options:
 
-    - #### Option 1: Using the Prefab
-      When Instantiating, you may pass a reference to a Prefab that the Object Pooler is managing,
-      ```c#
-      ObjectPooler.Instantiate(ProjectilePrefab, SpawnTransform.position, SpawnTransform.rotation);
-      ```
-    - #### Option 2: Using A Tag
-      Alternatively, you can pass in the tag that the Object Pooler is assigning to the GameObject's you want.
-      ```c#
-      ObjectPooler.Instantiate("PlayerProjectile", SpawnTransform.position, SpawnTransform.rotation);
-      ```
+#### Option 1: Using the Prefab
+When Instantiating, you may pass a reference to a Prefab that the Object Pooler is managing,
+```c#
+ObjectPooler.Instantiate(ProjectilePrefab, SpawnTransform.position, SpawnTransform.rotation);
+```
+#### Option 2: Using A Tag
+Alternatively, you can pass in the tag that the Object Pooler is assigning to the GameObject's you want.
+```c#
+ObjectPooler.Instantiate("PlayerProjectile", SpawnTransform.position, SpawnTransform.rotation);
+```
+
 In both cases, if the Identifier (Prefab or Tag) is not found in the set of PoolableTypes, then the Object Pooler will return `null`.
 Therefore you can check the return value of the `Instantiate()` function, to know if it was successful or not.
 
