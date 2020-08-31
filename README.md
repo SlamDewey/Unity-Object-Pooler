@@ -22,36 +22,32 @@ This is essentially just used for organization of the insepctor, and will not af
 
 ### Poolable Types
 The second variable in the inspector is a `List<PoolableType>`. A `PoolableType` is a class defined at the top of the `ObjectPooler.cs`
-file, and is used to house variables the Object Pooler uses for operation.
+file, and is used to house variables used to define a Pool and it's Objects.
 
 ![Creating the first PoolableType](/images/2.png)
 
 I wil briefly summarize the purpose of each variable below:
-###### `Name`
-The Name of the PoolableType does not affect operation, and is simply used to organize the List of Poolable Types.
+    - `Name`
+        - The Name of the PoolableType does not affect operation, and is simply used to organize the List of Poolable Types.
+    - `Prefab`
+        - The Prefab slot stores a reference to the prefab that you want to pool.  The Object Pooler class will use this prefab definition when
+          instantiating new objects.
+    - `Sorting Tag`
+        - Each object tracked by the object pooler is organized using GameObject Tags.
+###### _Note: No two `PooledType`'s can use the same Tag_
+    - `Max`
+        - The value of Max is used to define the initial quantity of objects that the pool should instantiate.
+    - `Auto Expand`
+        - When the user requests an object from an Object Pool, it may be the case that the Pooler has no objects left to give.  If Auto Expand is set to True, the 
+          Object Pooler will instantiate and begin tracking a new instance of the associated Prefab, regardless of the value of `Max`.
 
-###### `Prefab`
-The Prefab slot stores a reference to the prefab that you want to pool.  The Object Pooler class will use this prefab definition when
-instantiating new objects.
-
-###### `Sorting Tag`
-Each object tracked by the object pooler is organized using GameObject Tags.
-_Note: No two `PooledType`'s can use the same Tag_
-
-###### `Max`
-The value of Max is used to define the initial quantity of objects that the pool should instantiate.
-
-###### `Auto Expand`
-When the user requests an object from an Object Pool, it may be the case that the Pooler has no objects left to give.  If Auto Expand is set to True, the 
-Object Pooler will instantiate and begin tracking a new instance of the associated Prefab, regardless of the value of `Max`.
-
-### An example of a properly created `ObjectPooler` may look like:
+#### An example of a properly created `ObjectPooler` may look like:
 
 ![An Example of an object pooler](/images/3.png)
 
 
 ## Using The Object Pooler In Your Code
-_Note: The Object Pooler class uses static functions and a private static singleton_
+###### _Note: The Object Pooler class uses static functions and a private static singleton_
 
 ### Getting Objects from a Pool
 
