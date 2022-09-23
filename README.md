@@ -42,7 +42,7 @@ I will briefly summarize the purpose of each variable below:
       instantiating new objects.
 
  - `Sorting Tag`
-    - Each object tracked by the object pooler is organized using GameObject Tags.
+    - Each object tracked by the object pooler is organized using the GameObject's `name` property.
 ###### _Note: No two `PooledType`'s can use the same `Sorting Tag`_
  - `Max`
     - The value of Max is used to define the initial quantity of objects that the pool should instantiate.
@@ -67,18 +67,18 @@ When you need to "create" a new object (i.e. you would like to request an object
 An object instantiation can have two distinct options:
 
 #### Option 1: Using the Prefab
-When Instantiating, you may pass a reference to a Prefab that the Object Pooler is managing,
+When Instantiating, you may pass a reference to a Prefab that the `ObjectPooler` is managing,
 ```c#
 ObjectPooler.Generate(ProjectilePrefab, SpawnTransform.position, SpawnTransform.rotation);
 ```
 #### Option 2: Using A Tag
-Alternatively, you can pass in the tag that the Object Pooler is assigning to the GameObject's you want.
+Alternatively, you can pass in the sorting tag for a `PoolableType` you've defined:
 ```c#
 ObjectPooler.Generate("PlayerProjectile", SpawnTransform.position, SpawnTransform.rotation);
 ```
 
 In both cases, if the `Identifier` (Prefab or Tag) is not found in the set of PoolableTypes, then the Object Pooler will return `null`.
-Therefore you can check the return value of the `Generate()` function, to know if it was successful or not.
+Therefore you can _(and should!)_ check the return value of the `Generate()` function, to know if it was successful or not.
 
 ___
 ### Destroying Objects
@@ -129,5 +129,6 @@ public class StandardProjectile : MonoBehaviour
 }
 ```
 
+Anybody using this repository should feel free to open an Issue to suggest changes, or fork and create a pull request if you'd like to submit your own changes.
 
-
+Thanks!
