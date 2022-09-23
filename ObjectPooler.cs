@@ -1,4 +1,4 @@
-﻿/*
+/*
  *	Unit Object Pooler Implemenation Created By Jared Massa
  *
  *	Copyright (c) 2020 Jared Massa
@@ -22,7 +22,9 @@
  *	SOFTWARE.
  */
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 #region PoolableType Definition
@@ -33,12 +35,12 @@ public class PoolableType
     public string TypeName;
 
     [Tooltip(@"The Prefab of the gameobject to be pooled")]
-	public GameObject Prefab;
+    public GameObject Prefab;
 
-    [Tooltip(@"The sorting tag is used to organize object pools.  Each object in a given pool will have the tag set.")]
-    [TagSelector] public string SortingTag = "";
+    [Tooltip(@"The sorting tag is used to organize object pools.  Each object in a given pool will have it's name set to this tag value.")]
+    public string SortingTag = "";
 
-    [Tooltip(@"The maximum number of objects to use.")]
+    [Tooltip(@"The maximum number of objects allowed to be instantiated.")]
     public int Max;
 
     [Tooltip(@"If true, the object pool can ignore the maximum if there are no objects in storage, and another is requested.")]
@@ -58,16 +60,36 @@ public class ObjectPooler : MonoBehaviour
     [SerializeField]
     private bool UseParentTransforms = false;
 
+    /// <summary>
+    /// A list of all poolable types (to be set in the inspector)
+    /// </summary>
     [Tooltip(@"A list of Poolable Type Definitions")]
     [SerializeField]
     private List<PoolableType> PoolableTypes = new List<PoolableType>();
 
-
-    // private variables
+    /// <summary>
+    /// a lookup table to link a sorting tag to a poolable type
+    /// </summary>
     private Dictionary<string, PoolableType> TagTypeLookup;
+
+    /// <summary>
+    /// A lookup table which links a prefab to an object pool
+    /// </summary>
     private Dictionary<GameObject, PoolableType> PrefabTypeLookup;
+
+    /// <summary>
+    /// A dictionary to link a sorting tag to a pool of sleeping objects.
+    /// </summary>
     private Dictionary<string, Queue<GameObject>> SleepingObjects;
+
+    /// <summary>
+    /// 
+    /// </summary>
     private Dictionary<string, HashSet<GameObject>> ActiveObjects;
+
+    /// <summary>
+    /// A lookup table which links a sorting tag to a parent transform (assuming UseParentTransforms = true)
+    /// </summary>
     private Dictionary<string, Transform> TypeParents;
     #endregion
 
@@ -75,6 +97,7 @@ public class ObjectPooler : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+
         // init dictionaries
         if (UseParentTransforms)
             TypeParents = new Dictionary<string, Transform>();
@@ -82,50 +105,63 @@ public class ObjectPooler : MonoBehaviour
         PrefabTypeLookup = new Dictionary<GameObject, PoolableType>();
         SleepingObjects = new Dictionary<string, Queue<GameObject>>();
         ActiveObjects = new Dictionary<string, HashSet<GameObject>>();
+
         // init types and sets in dicts
         foreach (PoolableType type in PoolableTypes)
         {
             if (UseParentTransforms)
             {
-                GameObject Par = new GameObject(type.TypeName + " Parent");
-                Par.transform.parent = transform;
-                TypeParents[type.SortingTag] = Par.transform;
+                // create empty GameObject to store children under
+                GameObject SortinParent = new GameObject(type.TypeName + " Parent");
+                // assign this GameObject to be a child of whatever GameObject this script is attached to
+                SortinParent.transform.parent = transform;
+                // add a reference to this parent in the TypeParents lookup
+                TypeParents[type.SortingTag] = SortinParent.transform;
             }
-            // add reference to type
+
+            // add a reference for this sorting tag in each of the required dicitonaries
             TagTypeLookup.Add(type.SortingTag, type);
             PrefabTypeLookup.Add(type.Prefab, type);
             SleepingObjects.Add(type.SortingTag, new Queue<GameObject>());
             ActiveObjects.Add(type.SortingTag, new HashSet<GameObject>());
+
             // init sleeping objects
             for (int i = 0; i < type.Max; i++)
             {
-                GameObject t = Instantiate(type.Prefab, UseParentTransforms ? TypeParents[type.SortingTag] : transform);
-                t.tag = type.SortingTag;
-                t.SetActive(false);
-                SleepingObjects[type.SortingTag].Enqueue(t);
+                // create gameobject and set it's parent as appropriate
+                GameObject pooledObject = Instantiate(type.Prefab, UseParentTransforms ? TypeParents[type.SortingTag] : transform);
+                // name the gameobject for easy sorting
+                pooledObject.name = type.SortingTag;
+                // inactivate the gameobject for storage
+                pooledObject.SetActive(false);
+                // add this object to the sleeping pool
+                SleepingObjects[type.SortingTag].Enqueue(pooledObject);
             }
         }
     }
     #endregion
 
     #region Destroy
-    public static void Destroy(GameObject obj) => Instance._Destroy(obj);
+
     /// <summary>
     /// Deactivate an active object, and enqueue it for later restoration.
     /// </summary>
     /// <param name="obj">The active object to deactivate</param>
+    public static void Destroy(GameObject obj) => Instance._Destroy(obj);
+
     private void _Destroy(GameObject obj)
     {
+        string sortingTag = obj.name;
         // check if this object is one we actually pool
-        if (!ActiveObjects.ContainsKey(obj.tag)) return;
+        if (!ActiveObjects.ContainsKey(sortingTag)) return;
         // check if this object is actually in our active set right now
-        if (!ActiveObjects[obj.tag].Contains(obj)) return;
+        if (!ActiveObjects[sortingTag].Contains(obj)) return;
         // since it is, we will deactivate the object
         obj.SetActive(false);
-        // then add it to the sleeping queue
-        SleepingObjects[obj.tag].Enqueue(obj);
-        // and remove it from the active set
-        ActiveObjects[obj.tag].Remove(obj);
+        // then remove it from the active set
+        ActiveObjects[sortingTag].Remove(obj);
+        // and add it to the sleeping queue
+        SleepingObjects[sortingTag].Enqueue(obj);
     }
     #endregion
 
@@ -164,25 +200,30 @@ public class ObjectPooler : MonoBehaviour
     {
         // get the tag of the prefab we wish to instantiate
         string Tag = "";
-        // user passed us a tag
+        // did the user pass us a string tag?
         if (Identifier is string)
         {
             if (!SleepingObjects.ContainsKey(Identifier as string)) return null;
             else Tag = Identifier as string;
         }
-        // user passed us a prefab
+        // did the user pass us a prefab?
         else if (Identifier is GameObject)
         {
+            // check if this prefab is one that we manage
             if (!PrefabTypeLookup.ContainsKey(Identifier as GameObject)) return null;
+            // if we manage this type, get the tag
             else Tag = PrefabTypeLookup[Identifier as GameObject].SortingTag;
         }
         else return null;
 
         // If we make it here, we know the tag has been set and exists.
-        GameObject Member = null;
+        GameObject Member;
         // if no objects are left in the queue, but we can auto expand, then make a new object
         if (SleepingObjects[Tag].Count == 0 && TagTypeLookup[Tag].AutoExpand)
+        {
             Member = Instantiate(TagTypeLookup[Tag].Prefab, UseParentTransforms ? TypeParents[Tag] : transform);
+            Member.name = Tag;
+        }
         // else if there are members in the queue get the member from the sleeping queue
         else if (SleepingObjects[Tag].Count > 0)
             Member = SleepingObjects[Tag].Dequeue();
@@ -193,6 +234,7 @@ public class ObjectPooler : MonoBehaviour
         Member.transform.position = Position;
         Member.transform.rotation = Rotation;
         ActiveObjects[Tag].Add(Member);
+
         // can't forget to do this!
         Member.SetActive(true);
 
@@ -200,72 +242,3 @@ public class ObjectPooler : MonoBehaviour
     }
     #endregion
 }
-
-#region TagSelectorDefinition
-#if UNITY_EDITOR
-//Original by DYLAN ENGELMAN http://jupiterlighthousestudio.com/custom-inspectors-unity/
-//Altered by Brecht Lecluyse http://www.brechtos.com
-public class TagSelectorAttribute : PropertyAttribute
-{
-    public bool UseDefaultTagFieldDrawer = false;
-}
-[CustomPropertyDrawer(typeof(TagSelectorAttribute))]
-public class TagSelectorPropertyDrawer : PropertyDrawer
-{
-    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-    {
-        if (property.propertyType == SerializedPropertyType.String)
-        {
-            EditorGUI.BeginProperty(position, label, property);
-
-            var attrib = attribute as TagSelectorAttribute;
-
-            if (attrib.UseDefaultTagFieldDrawer)
-                property.stringValue = EditorGUI.TagField(position, label, property.stringValue);
-
-            else
-            {
-                //generate the taglist + custom tags
-                List<string> tagList = new List<string>();
-                tagList.AddRange(UnityEditorInternal.InternalEditorUtility.tags);
-                string propertyString = property.stringValue;
-                int index = -1;
-                if (propertyString == "")
-                {
-                    //The tag is empty
-                    index = 0; //first index is the special <notag> entry
-                }
-                else
-                {
-                    //check if there is an entry that matches the entry and get the index
-                    //we skip index 0 as that is a special custom case
-                    for (int i = 1; i < tagList.Count; i++)
-                    {
-                        if (tagList[i] == propertyString)
-                        {
-                            index = i;
-                            break;
-                        }
-                    }
-                }
-
-                //Draw the popup box with the current selected index
-                index = EditorGUI.Popup(position, label.text, index, tagList.ToArray());
-
-                //Adjust the actual string value of the property based on the selection
-                if (index == 0)
-                    property.stringValue = "";
-                else if (index >= 1)
-                    property.stringValue = tagList[index];
-                else
-                    property.stringValue = "";
-            }
-
-            EditorGUI.EndProperty();
-        }
-        else
-            EditorGUI.PropertyField(position, property, label);
-    }
-}
-#endif
-#endregion
